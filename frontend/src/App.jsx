@@ -5,6 +5,7 @@ import UploadSection from './components/UploadSection';
 import ResultDisplay from './components/ResultDisplay';
 import LoadingSpinner from './components/LoadingSpinner';
 
+const API_URL = import.meta.env.VITE_API_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;
 function App() {
   const [results, setResults] = useState(null);
@@ -16,26 +17,32 @@ function App() {
     setError(null);
     setResults(null);
 
-    try {
-      const response = await axios.post('/api/document-analyze', {
-        fileName,
-        fileType,
-        fileBase64
-      }, {
-        headers: {
-          'x-api-key': API_KEY,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      setResults(response.data);
-    } catch (err) {
-      console.error('API Error:', err);
-      const errorMessage = err.response?.data?.detail || err.message || 'Failed to analyze document. Please check the backend connection.';
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
+try {
+  const response = await axios.post(`${API_URL}/api/document-analyze`, {
+    fileName,
+    fileType,
+    fileBase64
+  }, {
+    headers: {
+      'x-api-key': API_KEY,
+      'Content-Type': 'application/json'
     }
+  });
+
+  setResults(response.data);
+} catch (err) {
+  console.error('API Error:', err);
+  const errorMessage = err.response?.data?.detail || err.message || 'Failed to analyze document. Please check the backend connection.';
+  setError(errorMessage);
+} finally {
+  setIsLoading(false);
+}
+  };
+
+  const reset = () => {
+    setResults(null);
+    setError(null);
+  };
   };
 
   const reset = () => {
