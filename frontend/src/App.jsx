@@ -5,8 +5,10 @@ import UploadSection from './components/UploadSection';
 import ResultDisplay from './components/ResultDisplay';
 import LoadingSpinner from './components/LoadingSpinner';
 
-const API_URL = import.meta.env.VITE_API_URL;
-const API_KEY = import.meta.env.VITE_API_KEY;
+// Use safe fallback in case env vars are missing
+const API_URL = import.meta.env?.VITE_API_URL || "";
+const API_KEY = import.meta.env?.VITE_API_KEY || "";
+
 function App() {
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,32 +19,26 @@ function App() {
     setError(null);
     setResults(null);
 
-try {
-  const response = await axios.post(`${API_URL}/api/document-analyze`, {
-    fileName,
-    fileType,
-    fileBase64
-  }, {
-    headers: {
-      'x-api-key': API_KEY,
-      'Content-Type': 'application/json'
+    try {
+      const response = await axios.post(`${API_URL}/api/document-analyze`, {
+        fileName,
+        fileType,
+        fileBase64
+      }, {
+        headers: {
+          'x-api-key': API_KEY,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      setResults(response.data);
+    } catch (err) {
+      console.error('API Error:', err);
+      const errorMessage = err.response?.data?.detail || err.message || 'Failed to analyze document. Please check the backend connection.';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-  });
-
-  setResults(response.data);
-} catch (err) {
-  console.error('API Error:', err);
-  const errorMessage = err.response?.data?.detail || err.message || 'Failed to analyze document. Please check the backend connection.';
-  setError(errorMessage);
-} finally {
-  setIsLoading(false);
-}
-  };
-
-  const reset = () => {
-    setResults(null);
-    setError(null);
-  };
   };
 
   const reset = () => {
@@ -52,7 +48,7 @@ try {
 
   return (
     <div className="min-h-screen w-full gradient-bg overflow-x-hidden selection:bg-indigo-500/30">
-      {/* Background blobs for aesthetics */}
+      {/* Background Blobs */}
       <div className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none">
         <div className="absolute top-20 left-[10%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
         <div className="absolute bottom-20 right-[10%] w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
@@ -83,19 +79,19 @@ try {
 
           {error && (
             <div className="w-full max-w-2xl mx-auto p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center space-y-4">
-               <div className="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto">
-                 <RefreshCcw className="w-6 h-6 text-rose-400" />
-               </div>
-               <div className="space-y-1">
-                 <h3 className="text-lg font-bold text-rose-400">Analysis Failed</h3>
-                 <p className="text-slate-400">{error}</p>
-               </div>
-               <button 
+              <div className="w-12 h-12 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto">
+                <RefreshCcw className="w-6 h-6 text-rose-400" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-rose-400">Analysis Failed</h3>
+                <p className="text-slate-400">{error}</p>
+              </div>
+              <button 
                 onClick={reset}
                 className="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all font-semibold"
-               >
-                 Try Again
-               </button>
+              >
+                Try Again
+              </button>
             </div>
           )}
 
@@ -124,9 +120,7 @@ try {
               { icon: <RefreshCcw className="text-emerald-400" />, title: "OCR Integration", desc: "State-of-the-art text extraction from images and scanned PDFs." }
             ].map((f, i) => (
               <div key={i} className="p-6 rounded-2xl glass-morphism space-y-4 hover:translate-y-[-4px] transition-all">
-                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                  {f.icon}
-                </div>
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">{f.icon}</div>
                 <h4 className="font-bold text-white uppercase tracking-wider text-sm">{f.title}</h4>
                 <p className="text-slate-400 text-sm">{f.desc}</p>
               </div>
