@@ -5,8 +5,7 @@ import UploadSection from './components/UploadSection';
 import ResultDisplay from './components/ResultDisplay';
 import LoadingSpinner from './components/LoadingSpinner';
 
-const API_KEY = 'AIzaSyBQDqohcHRcGEaF-Q22LrZAnEYce5q1pe0';
-
+const API_KEY = import.meta.env.VITE_API_KEY;
 function App() {
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
