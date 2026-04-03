@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pdfplumber
+python-docx
+pytesseract
+Pillow>=10.3.0
+transformers
+torch
+spacy
+textblob
+celery[redis]
+python-dotenv
+redis
